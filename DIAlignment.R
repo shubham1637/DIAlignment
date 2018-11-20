@@ -6,7 +6,11 @@ library(DIAlign)
 OuterProdMeanNormAll6Func <- function (data, pep, runA, runB) 
 {
   # pep = "55711_TFISPIK/2"
+<<<<<<< HEAD
   # runA = "Plasma5"; runB = "Plasma18";
+=======
+  # runA = "Plasma13"; runB = "Plasma15";
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
   # data <- StrepChromsPlasma
   num_of_frag <- length(data[[runA]][[pep]])
   num_of_samplesA <- length(data[[runA]][[pep]][[1]][, 1])
@@ -19,7 +23,10 @@ OuterProdMeanNormAll6Func <- function (data, pep, runA, runB)
   MeanNormB <- mean(MeanNormB)
   outerProdList <- list()
   for (i in 1:num_of_frag) {
+<<<<<<< HEAD
     print(i)
+=======
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
     NormIntensityA <- data[[runA]][[pep]][[i]][, 2]/MeanNormA
     NormIntensityB <- data[[runB]][[pep]][[i]][, 2]/MeanNormB
     outerProdList[[i]] <- outer(NormIntensityA, NormIntensityB)
@@ -27,7 +34,10 @@ OuterProdMeanNormAll6Func <- function (data, pep, runA, runB)
   return(outerProdList)
 }
 
+<<<<<<< HEAD
 # when merging single run with already merged smth: C + ABD
+=======
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
 OuterProdMeanNormAll6Func_forMerged <- function (data, dataMerged, pep, runA, runB) 
   {
     num_of_frag <- length(data[[runA]][[pep]])
@@ -71,7 +81,11 @@ getSimilarityMatrix_forMerged <- function (data, dataMerged, pep, runA, runB, ty
 }
 
 OuterProdL2NormAllFunc_forMerged <- function(data,dataMerged, pep, runA, runB){
+<<<<<<< HEAD
   num_of_frag <- length(dataMerged[[runB]][[pep]])
+=======
+  num_of_frag <- length(data[[runA]][[pep]])
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
   L2NormA <- sapply(data[[runA]][[pep]], function(x) x[,2])
   L2NormA <- sqrt(rowSums(L2NormA^2))
   L2NormB <- sapply(dataMerged[[runB]][[pep]], function(x) x[,2])
@@ -86,9 +100,57 @@ OuterProdL2NormAllFunc_forMerged <- function(data,dataMerged, pep, runA, runB){
   }
   return(outerProdList) }
 
+<<<<<<< HEAD
 
 
 
+=======
+## function getAlignObj considering only M instead of M, A and B
+getAlignObj <- function(s, gap, FreeEndGaps=TRUE){
+  ChromA_Len <- dim(s)[1]
+  ChromB_Len <- dim(s)[2]
+  M <- matrix(NA, nrow = ChromA_Len+1, ncol = ChromB_Len+1)
+  Traceback <- vector("list", 1)
+  Traceback[[1]] <- matrix(0, nrow = ChromA_Len+1, ncol = ChromB_Len+1)
+  names(Traceback) <- c("TrM")
+  
+  M[1,] <- -seq(from = 0, to = (ncol(M) -1)*gap ,by = gap)
+  M[,1] <- -seq(from = 0, to = (nrow(M) -1)*gap ,by = gap)
+  M[1,1] <- 0
+  Traceback[["TrM"]][2:(ChromA_Len+1), 1] <- "T"
+  Traceback[["TrM"]][1, 2:(ChromB_Len+1)] <- "L"
+  Traceback[["TrM"]][1,1] <- "D"
+  
+  for(j in 2:(ChromB_Len+1)){
+    for(i in 2:(ChromA_Len+1)){
+      Diago <- M[i-1,j-1] + s[i-1, j-1]
+      gapInA <- M[i-1,j] - gap
+      gapInB <- M[i,j-1] - gap
+      M[i,j] <- max(Diago, gapInA, gapInB)
+      if(M[i,j] == Diago) Traceback[["TrM"]][i, j] <- "D" # D: Diagonal
+      else if(M[i,j] == gapInA) Traceback[["TrM"]][i, j] <- "L" # L: Left
+      else Traceback[["TrM"]][i, j] <- "T" # T: Top
+    }}
+  
+  return(new("NeedleObj", Traceback = Traceback, M = M, Gap = gap, FreeEndGaps = FreeEndGaps))
+}
+
+setClass(Class="NeedleObj", representation(Traceback = "list", M = "matrix", Gap = "numeric", FreeEndGaps = "logical") )
+
+M = 10; MM = -2; go = 10; ge = 7
+seq1 = "GCAT"
+seq2 = "CAGTG"
+seq3 = "PAWHEAE"
+seq4 = "HEAGAWGHE"
+
+s = matrix(NA, nrow = nchar(seq3), ncol= nchar(seq4))
+for(i in 1:nrow(s)){
+  for(j in 1: ncol(s)){
+    if(substr(seq3, start = i, stop = i) == substr(seq4, start = j, stop = j)) s[i,j] <- M
+    else s[i,j] <- MM
+  }
+}
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
 
 obj2  <- getAlignObj(s, go, FreeEndGaps=F)
 obj3 <- getAffineAlignObj(s, go, ge, FreeEndGaps= F)
@@ -126,6 +188,17 @@ TerminalNAnumber <- function (vector) {
   return(c(NAstart, NAend))
 }
 
+<<<<<<< HEAD
+=======
+
+# for (matrix in getAlignment(obj3)) {
+#   MaxScores <- matrix[,"score"]
+#   RowIndices <- matrix[,"indexA_aligned"]
+#   ColIndices <- matrix[,"indexB_aligned"]
+# }
+# TerminalNAnumber(RowIndices)
+
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
 ### Function SumNearMaxScores gives as an output vector of values: background sums (4x4) for each max score
 SumNearMaxScores <- function(alignObj) {
     MaxScores <- getAlignment(alignObj)[[1]][,"score"]
@@ -136,6 +209,12 @@ SumNearMaxScores <- function(alignObj) {
   NumRow <- nrow(alignObj@M)
   NumCol <- ncol(alignObj@M)
 
+<<<<<<< HEAD
+=======
+  # shift <- NumCol - length(MaxScores)
+  # print(shift)
+  
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
   # first maximum score - M[n,n], calculate the background sum of the 4x4 square with this score in the lowest right corner
   MaxIndices <- c(NumRow, NumCol)
   SumNearMax <- c(sum(alignObj@M[(NumRow - 3):NumRow, (NumCol - 3):NumCol]))
@@ -218,6 +297,21 @@ SumNearMaxScores <- function(alignObj) {
 SumNearMaxScores(Alignobj)
 getAlignment(Alignobj)
 
+<<<<<<< HEAD
+=======
+############
+############ function PlotChromatogram: output - plot with MS2 chromatogram
+# plotChromatogram <- function(data, run, peptide, StrepAnnot, printTitle =TRUE){
+#   df <- do.call("cbind", data[[run]][[peptide]])
+#   df <- df[,!duplicated(colnames(df))]
+#   df <- melt(df, id.vars="time", value.name = "Intensity")
+#   g <- ggplot(df, aes(time, Intensity, col=variable)) + geom_line(show.legend = FALSE) + theme_bw()
+#   if(printTitle) g <- g + ggtitle(paste0(run, ", ",peptide)) + theme(plot.title = element_text(hjust = 0.5))
+#   g <- g + geom_vline(xintercept=StrepAnnot[peptide, run], lty="dotted", size = 0.4)
+#   return(g)
+# }
+
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
 ############################################################################
 ######################## PLOTS CHROM ALIGNMENT #############################
 ############################################################################
@@ -274,15 +368,25 @@ plotAlignedChroms <- function(data, pair, peptide, ObservedRT, #AlignErrorinSec,
   }
 }
 
+<<<<<<< HEAD
 # This function plots chromatogram after merging runs (doesn't consider actual retention time, uses only indices)
+=======
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
 plotChromatogramMerged <- function(data, runname, peptide, #type = c("Mean", "Median", "WeightedMean"),
                                    printTitle = TRUE){
   # type <- match.arg(type)
   # switch(type, Mean = {
+<<<<<<< HEAD
   for (i in 1:length(data[[runname]][[peptide]])) {
      # data[[runname]][[peptide]][[i]] <- data[[runname]][[peptide]][[i]][, c(1:2)]
       names(data[[runname]][[peptide]][[i]]) <- c("time", paste(i,peptide,sep = "_"))
    } 
+=======
+  #   for (i in 1:length(data[[runname]][[peptide]])) {
+  #     data[[runname]][[peptide]][[i]] <- data[[runname]][[peptide]][[i]][, c(1:2)]
+  #     names(data[[runname]][[peptide]][[i]]) <- c("time", paste(i,peptide,sep = "_"))
+  # } 
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
   #   } , Median = {
   #   for (i in 1:length(data[[runname]][[peptide]])) {
   #     data[[runname]][[peptide]][[i]] <- data[[runname]][[peptide]][[i]][, c(1,3)]
@@ -301,8 +405,13 @@ plotChromatogramMerged <- function(data, runname, peptide, #type = c("Mean", "Me
   df <- df[,!duplicated(colnames(df))]
   df <- melt(df, id.vars="time", value.name = "Intensity")
   g <- ggplot(df, aes(time, Intensity, col=variable)) + geom_line(show.legend = FALSE) + theme_bw()
+<<<<<<< HEAD
   if(printTitle) g <- g + ggtitle(paste0(runname, ", ", peptide)) + #,subtitle = type) 
                                    theme(plot.title = element_text(size = 9,hjust = 0.5)) #, plot.subtitle = element_text(size=8, hjust=0.5, face="italic"))
+=======
+  if(printTitle) g <- g + ggtitle(paste0(runname, ", ", peptide), subtitle = type) + theme(plot.title = element_text(size = 8,hjust = 0.5),
+                                                                                           plot.subtitle = element_text(size=8, hjust=0.5, face="italic"))
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
   # g <- g + geom_vline(xintercept=ObservedRT[peptide, runname], lty="dotted", size = 0.4)
   return(g)
 }
@@ -522,7 +631,11 @@ OuterProdMeanNormAll6Func_random <- function(data, pepA, pepB, runA, runB)
   return(outerProdList)
 }
 
+<<<<<<< HEAD
 ### 2: add pepA and pepB instead of pep (everywhere)
+=======
+### 2 
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
 OuterProdL2NormAllFunc_random <- function(data, pepA,pepB, runA, runB){
   num_of_frag <- length(data[[runA]][[pepA]])
   L2NormA <- sapply(data[[runA]][[pepA]], function(x) x[,2])
@@ -539,7 +652,11 @@ OuterProdL2NormAllFunc_random <- function(data, pepA,pepB, runA, runB){
   }
   return(outerProdList) }
 
+<<<<<<< HEAD
 ### 3: add pepA and pepB instead of pep (everywhere)
+=======
+### 3
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
 library(FuzzyStatTra)
 library(Omisc)
 getSimilarityMatrixForRandom <- function (data, pepA, pepB, runA, runB, type = c("dotProductMasked", 
@@ -586,7 +703,11 @@ getSimilarityMatrixForRandom <- function (data, pepA, pepB, runA, runB, type = c
 ## Then repeat the local alignment and building plots with 2 random peptides from different runs. 
 gapQuantile <- 0.5; goFactor <- 1/8; geFactor <- 40
 simMeasure <- "dotProductMasked"
+<<<<<<< HEAD
 run_pair <- c("run2", "run3")
+=======
+run_pair <- c("run1", "run2")
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
 Err <- matrix(NA, nrow = length(PeptidesA), ncol = 1)
 rownames(Err) <- PeptidesA
 ListOfSimMatricesRandom <- list()
@@ -597,8 +718,13 @@ NumberOfGapsRandom <- c()
 NumberOfGapsRandomList <- list()
 AverageMaxScoreRandom <- list()
 MedianOfMRandom <- list()
+<<<<<<< HEAD
 PeptidesA <- peptides[8:12]
 PeptidesB <- peptides[13:17]
+=======
+PeptidesA <- peptides[8:11]
+PeptidesB <- peptides[13:16]
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
 for (peptideA in PeptidesA){
   for (peptideB in PeptidesB) {
     s <- getSimilarityMatrixForRandom(StrepChroms, peptideA, peptideB, run_pair[1], run_pair[2], type = simMeasure)
@@ -611,6 +737,7 @@ for (peptideA in PeptidesA){
     ListOfBackgroundSumRandom[[paste0("", peptideA," - ",peptideB)]] <- SumNearMaxScores(Alignobj)
     
     NumberOfGapsRandom <-c(NumberOfGapsRandom, sum(is.na(AlignedIndices[[1]][TerminalNAnumber(AlignedIndices[[1]][,1])[1]:TerminalNAnumber(AlignedIndices[[1]][,1])[2],1]), 
+<<<<<<< HEAD
                                                    is.na(AlignedIndices[[1]][TerminalNAnumber(AlignedIndices[[1]][,1])[1]:TerminalNAnumber(AlignedIndices[[1]][,1])[2],2]),
                                                    is.na(AlignedIndices[[1]][TerminalNAnumber(AlignedIndices[[1]][,2])[1]:TerminalNAnumber(AlignedIndices[[1]][,2])[2],1]), 
                                                    is.na(AlignedIndices[[1]][TerminalNAnumber(AlignedIndices[[1]][,2])[1]:TerminalNAnumber(AlignedIndices[[1]][,2])[2],2])))
@@ -621,6 +748,13 @@ for (peptideA in PeptidesA){
                                                                          is.na(AlignedIndices[[1]][TerminalNAnumber(AlignedIndices[[1]][,2])[1]:TerminalNAnumber(AlignedIndices[[1]][,2])[2],1]), 
                                                                          is.na(AlignedIndices[[1]][TerminalNAnumber(AlignedIndices[[1]][,2])[1]:TerminalNAnumber(AlignedIndices[[1]][,2])[2],2]))
 
+=======
+                                       is.na(AlignedIndices[[1]][TerminalNAnumber(AlignedIndices[[1]][,1])[1]:TerminalNAnumber(AlignedIndices[[1]][,1])[2],2])))
+    
+    NumberOfGapsRandomList[[paste0("", peptideA," - ",peptideB)]] <- sum(is.na(AlignedIndices[[1]][TerminalNAnumber(AlignedIndices[[1]][,1])[1]:TerminalNAnumber(AlignedIndices[[1]][,1])[2],1]), 
+                                       is.na(AlignedIndices[[1]][TerminalNAnumber(AlignedIndices[[1]][,1])[1]:TerminalNAnumber(AlignedIndices[[1]][,1])[2],2]))
+    
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
     AverageMaxScoreRandom[[paste0("", peptideA," - ",peptideB)]] <-
       AlignedIndices[[1]][length(AlignedIndices[[1]][,3]), 3] / length(AlignedIndices[[1]][ ,3])
     MedianOfMRandom[[paste0("", peptideA," - ",peptideB)]] <- median(Alignobj@M)
@@ -630,7 +764,11 @@ for (peptideA in PeptidesA){
     tB.aligned <- mapIdxToTime(tB, AlignedIndices[[1]][,"indexB_aligned"])
     predictTime <- tB.aligned[which.min(abs(tA.aligned - StrepAnnot[peptideA, run_pair[1]]))]
     deltaT <- predictTime - StrepAnnot[peptideB, run_pair[2]]
+<<<<<<< HEAD
    # Err[peptideA, 1] <- deltaT
+=======
+    Err[peptideA, 1] <- deltaT
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
   }
 }
 
@@ -647,7 +785,10 @@ plotsRatioRandom <- list()
 plotStatsRandom <- list()
 peptidenamesRandom <- names(ListOfBackgroundSumRandom)
 for (peptide in peptidenamesRandom) {
+<<<<<<< HEAD
   #pdf(paste("AlignedChroms",gsub("/","-",peptide),"runsRandom.pdf", sep = "_"))
+=======
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
   BackgroundSumRandom[[paste0("", peptide)]] <- c(rep(NA, length(ListOfBackgroundSumRandom[[peptide]])))
   for (i in length(BackgroundSumRandom[[paste0("", peptide)]]):2) {
     BackgroundSumRandom[[paste0("", peptide)]][i] <- ListOfBackgroundSumRandom[[paste0("", peptide)]][i-1] -
@@ -664,6 +805,7 @@ for (peptide in peptidenamesRandom) {
     }
   }
   RatioRandom[[peptide]] <- MaxScoresAllRandom[[peptide]][length(BackgroundSumRandom[[peptide]]):1] / BackgroundSumRandom[[peptide]]
+<<<<<<< HEAD
   
   m <- ggplot(as.data.frame(RatioRandom[[peptide]]), aes(x = as.numeric(RatioRandom[[peptide]]))) 
   m <- m + geom_density() 
@@ -673,6 +815,8 @@ for (peptide in peptidenamesRandom) {
   print(AUC[[peptide]])
 
 
+=======
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
   ScoreDataFramesRandom[[peptide]] <- data.frame(rbind(cbind(BackgroundSumRandom[[peptide]], c(rep("Background Sum", 
                                                                                        length(BackgroundSumRandom[[peptide]])))),
                                                  cbind(MaxScoresAllRandom[[peptide]], c(rep("Maximum Score",
@@ -684,14 +828,35 @@ for (peptide in peptidenamesRandom) {
                                                 c(MedianOfMRandom[[peptide]], "Median of the score matrics"),
                                                 c(median(RatioRandom[[peptide]], na.rm = T), "Median of a MaxScore/Background ratio")))
   names(StatsDataFrameRandom[[peptide]]) <- c("score", "V2")
+<<<<<<< HEAD
   
   # store some plots
+=======
+}
+
+require(MESS)
+AUC <- list()
+for (peptide in peptidenamesRandom) {
+  plotsRandom[[peptide]] <- ggplot(ScoreDataFramesRandom[[peptide]], aes(x = as.numeric(Score), colour = Type, fill = Type)) +
+    geom_density(alpha = 0.3) +
+    labs(x = "Score") +
+    theme(legend.title = element_blank())
+ 
+   x <- c(); y <- c()
+  for (i in 1:length(table(RatioRandom[[peptide]]))) {
+    x <- c(x, as.numeric(names(table(RatioRandom[[peptide]])[i])))
+    y <- c(y, table(RatioRandom[[peptide]])[i][[1]])
+  }
+  AUC[[peptide]] <- auc(x,y)
+  
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
   plotsRatioRandom[[peptide]] <- ggplot(as.data.frame(RatioRandom[[peptide]]), aes(x = as.numeric(RatioRandom[[peptide]]))) +   
     geom_density(alpha = 0.3, color = "darkblue", fill = "darkblue") +
     labs(x = "Maximum score at each step /
          Background sum (4x4)") +
     theme(axis.title.y = element_text(size = 7),
           axis.title.x = element_text(size = 6)) +
+<<<<<<< HEAD
     annotate("text", label = paste("AUC = ", round(AUC[[peptide]],2)), x = max(RatioRandom[[peptide]], na.rm = T) - 
                max(RatioRandom[[peptide]], na.rm = T)/10, y_max - y_max/10, hjust = 1) +
     annotate("text", label = paste("mean = ", round(mean(RatioRandom[[peptide]],na.rm = T),2)),
@@ -703,14 +868,28 @@ for (peptide in peptidenamesRandom) {
   
   plotStatsRandom[[peptide]] <-   ggplot(subset(StatsDataFrameRandom[[peptide]], !(StatsDataFrameRandom[[peptide]]$V2 %in% c("Median of a MaxScore/Background ratio"))),
                                          aes(x = V2, y = as.numeric(as.character(score)))) +
+=======
+    annotate("text", label = paste("AUC = ", round(AUC[[peptide]],2)), x = max(RatioRandom[[peptide]], na.rm = T) -
+               max(RatioRandom[[peptide]], na.rm = T)/10, y = 4, hjust = 1) +
+    annotate("text", label = paste("mean = ", round(mean(RatioRandom[[peptide]],na.rm = T),2)),
+             x = max(RatioRandom[[peptide]], na.rm = T) - max(RatioRandom[[peptide]], na.rm = T)/10, y = 3.4,hjust = 1) +
+    annotate("text", label = paste("sd = ", round(sd(RatioRandom[[peptide]], na.rm = T),2)),
+             x = max(RatioRandom[[peptide]], na.rm = T) - max(RatioRandom[[peptide]], na.rm = T)/10, y = 2.8,hjust = 1)
+  
+  plotStatsRandom[[peptide]] <-   ggplot(subset(StatsDataFrameRandom[[peptide]], !(StatsDataFrameRandom[[peptide]]$V2 %in% c("Median of a MaxScore/Background ratio"))),
+                                   aes(x = V2, y = as.numeric(as.character(score)))) +
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
     geom_bar(stat = "identity", fill = "darkblue") +
     labs( x = "",
           y = "") +
     theme(axis.text.y = element_text(size = 7),
           axis.text.x = element_text(size = 6)) 
 }
+<<<<<<< HEAD
   
   # statplotsPlasma[[peptide]][[pair]] <- grid.arrange(plotsRatioPlasma[[peptide]][[pair]], plotStatsPlasma[[peptide]][[pair]], ncol = 2)
+=======
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
 
 
 
@@ -719,11 +898,19 @@ for(peptide in peptidenamesRandom) {
   statplotsRandom[[peptide]] <- grid.arrange(plotsRatioRandom[[peptide]], plotStatsRandom[[peptide]], ncol = 2)
 }
 
+<<<<<<< HEAD
 pdf(paste("ChromAndDistribAndStats_run2-3_Random_4x4background"))
 for(peptideA in PeptidesA) {
   for (peptideB in PeptidesB) {
     print(grid.arrange(plotChromatogram(StrepChroms, "run2", peptideA, StrepAnnot, printTitle =TRUE ),
                      plotChromatogram(StrepChroms, "run3", peptideB,StrepAnnot, printTitle =TRUE ),
+=======
+pdf(paste("ChromAndDistribAndStats_run1-2_Random_4x4background"))
+for(peptideA in PeptidesA) {
+  for (peptideB in PeptidesB) {
+    print(grid.arrange(plotChromatogram(StrepChroms, "run1", peptideA, StrepAnnot, printTitle =TRUE ),
+                     plotChromatogram(StrepChroms, "run2", peptideB,StrepAnnot, printTitle =TRUE ),
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
                      statplotsRandom[[paste0("", peptideA," - ",peptideB)]],
                      ncol = 1))
   }
@@ -731,7 +918,11 @@ for(peptideA in PeptidesA) {
 dev.off()
 
 
+<<<<<<< HEAD
 # Save plots to pdf
+=======
+
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
 pdf(paste("ChromAndDistribAndAligned_run1-2_RandomPeptides_4x4background"))
 for(peptideA in PeptidesA) {
   for (peptideB in PeptidesB) {
@@ -754,6 +945,68 @@ predict.run2 <- predict(loess.fit, data.frame(RUN1 = StrepAnnot[, run_pair[1]]))
 Err <- predict.run2 - StrepAnnot[,run_pair[2]]
 
 
+<<<<<<< HEAD
+=======
+# Hybrid alignment of chromatograms
+samplingTime <-3.4 # In example dataset, all points are acquired at 3.4 second interval.
+samples4gradient <- 100; RSEdistFactor <- 3.5; hardConstrain <- FALSE
+pair_names <- vector(); runs <- names(StrepChroms)
+for (i in 1:(length(runs)-1)){
+  for (j in (i+1): length(runs)){
+    pair_names <- c(paste(runs[i], runs[j], sep = "_"), pair_names)
+  }}
+globalStrep <- matrix(NA, nrow = 1, ncol = length(pair_names))
+colnames(globalStrep) <- pair_names
+rownames(globalStrep) <- c("RSE")
+
+for(pair in pair_names){
+  run_pair <- strsplit(pair, split = "_")[[1]]
+  Loess.fit <- getLOESSfit(run_pair, peptides, oswOutStrep, 0.1)
+  globalStrep["RSE", pair] <- Loess.fit$s
+}
+meanRSE <- mean(globalStrep["RSE",])
+gapQuantile <- 0.5; goFactor <- 1/8; geFactor <- 40
+simMeasure <- "dotProductMasked"
+run_pair <- c("run1", "run2"); pair <- "run1_run2"
+Err <- matrix(NA, nrow = length(peptides), ncol = 1)
+rownames(Err) <- peptides
+Loess.fit <- getLOESSfit(run_pair, peptides, oswOutStrep, 0.1)
+for(peptide in peptides){
+  s <- getSimilarityMatrix(StrepChroms, peptide, run_pair[1], run_pair[2], type = simMeasure)
+  gapPenalty <- getGapPenalty(s, gapQuantile, type = simMeasure)
+  tRunAVec <- StrepChroms[[run_pair[1]]][[peptide]][[1]][["time"]]
+  tRunBVec <- StrepChroms[[run_pair[2]]][[peptide]][[1]][["time"]]
+  noBeef <- ceiling(RSEdistFactor*min(globalStrep["RSE", pair], meanRSE)/samplingTime)
+  if(hardConstrain) {
+    MASK <- calcNoBeefMaskGlobal(tRunAVec, tRunBVec, Fit = Loess.fit, noBeef)
+    s <- constrainSimilarity(s, MASK, -2*max(s))
+  } else {
+    MASK <- calcNoBeefMaskGlobalWSlope(tRunAVec, tRunBVec, Fit = Loess.fit, noBeef)
+    s <- constrainSimilarity(s, MASK, -2*max(s)/samples4gradient) # it will take 100 time points to reach -2max
+  }
+  Alignobj <- getAffineAlignObj(s, go = gapPenalty*goFactor, ge = gapPenalty*geFactor)
+  AlignedIndices <- getAlignment(Alignobj)
+  tA <- StrepChroms[[run_pair[1]]][[peptide]][[1]][["time"]]
+  tB <- StrepChroms[[run_pair[2]]][[peptide]][[1]][["time"]]
+  tA.aligned <- mapIdxToTime(tA, AlignedIndices[[1]][,"indexA_aligned"])
+  tB.aligned <- mapIdxToTime(tB, AlignedIndices[[1]][,"indexB_aligned"])
+  predictTime <- tB.aligned[which.min(abs(tA.aligned - StrepAnnot[peptide, run_pair[1]]))]
+  deltaT <- predictTime - StrepAnnot[peptide, run_pair[2]]
+  Err[peptide, 1] <- deltaT
+}
+
+plotErrorCurve(abs(Err), "red", SameGraph = FALSE, xlab = "Retention time difference (in sec)", ylab = "Cumulative fraction of peptides")
+
+
+plotErrorCurve(abs(Err), "darkgreen", SameGraph = FALSE, xlab = "Retention time difference (in sec)", ylab = "Cumulative fraction of peptides")
+
+
+
+for (i in oswOutStrep.groups) {
+  print(i)
+}
+
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
 RSE4runsMatrix <- data.frame()
 names <- c()
 for (i in 1:length(globalStrep["RSE",]) ) {
@@ -850,7 +1103,10 @@ for (peptide in peptidesPlasma) {
   rownames(Score24runsPlasmaMatrices[[peptide]]) <- runsPlasma
 }
 
+<<<<<<< HEAD
 # Alignment, calculation of total number of gaps, background sums, maxximum scores (local), ratio, 
+=======
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
 AlignedChromsPlots <- list()
 BackgroundSumPlasma <- list()
 MaxScoresAllPlasma <- list()
@@ -893,6 +1149,7 @@ for(peptide in peptidesPlasma[1]){
     ListOfSimMatricesPlasma[[peptide]][[pair]] <- Alignobj@M
     AlignedIndices[[peptide]][[pair]] <- getAlignment(Alignobj)
     
+<<<<<<< HEAD
     NumberOfGapsPlasma <-c(NumberOfGapsPlasma, sum(is.na(AlignedIndices[[peptide]][[pair]][[1]][TerminalNAnumber(AlignedIndices[[peptide]][[pair]][[1]][,1])[1]:TerminalNAnumber(AlignedIndices[[peptide]][[pair]][[1]][,1])[2],1]), 
                                        is.na(AlignedIndices[[peptide]][[pair]][[1]][TerminalNAnumber(AlignedIndices[[peptide]][[pair]][[1]][,1])[1]:TerminalNAnumber(AlignedIndices[[peptide]][[pair]][[1]][,1])[2],2]),
                                        is.na(AlignedIndices[[peptide]][[pair]][[1]][TerminalNAnumber(AlignedIndices[[peptide]][[pair]][[1]][,2])[1]:TerminalNAnumber(AlignedIndices[[peptide]][[pair]][[1]][,2])[2],1]), 
@@ -916,6 +1173,30 @@ for(peptide in peptidesPlasma[1]){
     predictTime <- tB.aligned[which.min(abs(tA.aligned - StrepAnnotPlasma[peptide, run_pair[1]]))]
     deltaT <- predictTime - StrepAnnotPlasma[peptide, run_pair[2]]
     Err[peptide, 1] <- deltaT
+=======
+    NumberOfGapsPlasma <-c(NumberOfGapsPlasma, sum(is.na(AlignedIndices[[1]][TerminalNAnumber(AlignedIndices[[1]][,1])[1]:TerminalNAnumber(AlignedIndices[[1]][,1])[2],1]), 
+                                       is.na(AlignedIndices[[1]][TerminalNAnumber(AlignedIndices[[1]][,1])[1]:TerminalNAnumber(AlignedIndices[[1]][,1])[2],2]),
+                                       is.na(AlignedIndices[[1]][TerminalNAnumber(AlignedIndices[[1]][,2])[1]:TerminalNAnumber(AlignedIndices[[1]][,2])[2],1]), 
+                                       is.na(AlignedIndices[[1]][TerminalNAnumber(AlignedIndices[[1]][,2])[1]:TerminalNAnumber(AlignedIndices[[1]][,2])[2],2])))
+    
+    NumberOfGapsListPlasma[[peptide]][[pair]] <- sum(is.na(AlignedIndices[[1]][TerminalNAnumber(AlignedIndices[[1]][,1])[1]:TerminalNAnumber(AlignedIndices[[1]][,1])[2],1]), 
+                                                     is.na(AlignedIndices[[1]][TerminalNAnumber(AlignedIndices[[1]][,1])[1]:TerminalNAnumber(AlignedIndices[[1]][,1])[2],2]),
+                                                     is.na(AlignedIndices[[1]][TerminalNAnumber(AlignedIndices[[1]][,2])[1]:TerminalNAnumber(AlignedIndices[[1]][,2])[2],1]), 
+                                                     is.na(AlignedIndices[[1]][TerminalNAnumber(AlignedIndices[[1]][,2])[1]:TerminalNAnumber(AlignedIndices[[1]][,2])[2],2]))
+
+    ListOfAlignedIndicesPlasma[[peptide]][[pair]] <- AlignedIndices
+    AverageMaxScorePlasma[[peptide]][[pair]] <- AlignedIndices[[1]][length(AlignedIndices[[1]][,3]), 3] / length(AlignedIndices[[1]][ ,3])
+    MedianOfMPlasma[[peptide]][[pair]] <- median(Alignobj@M)
+    ListOfMaxScoresPlasma[[peptide]][[pair]] <- AlignedIndices[[1]][,"score"]
+    ListOfBackgroundSumPlasma[[peptide]][[pair]] <- SumNearMaxScores(Alignobj)
+    tA <- StrepChromsPlasma[[run_pair[1]]][[peptide]][[1]][["time"]]
+    tB <- StrepChromsPlasma[[run_pair[2]]][[peptide]][[1]][["time"]]
+    tA.aligned <- mapIdxToTime(tA, AlignedIndices[[1]][,"indexA_aligned"])
+    tB.aligned <- mapIdxToTime(tB, AlignedIndices[[1]][,"indexB_aligned"])
+    predictTime <- tB.aligned[which.min(abs(tA.aligned - StrepAnnotPlasma[peptide, run_pair[1]]))]
+    deltaT <- predictTime - StrepAnnotPlasma[peptide, run_pair[2]]
+    #Err[peptide, 1] <- deltaT
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
     
     # plotAlignedChroms(StrepChromsPlasma, pair, peptide, StrepAnnotPlasma, #AlignErrorinSec,
     #                                                                      AlignedIndices, tA, tB, FourOrTwo = TRUE)
@@ -941,7 +1222,10 @@ for(peptide in peptidesPlasma[1]){
     }
     RatioPlasma[[peptide]][[pair]] <- MaxScoresAllPlasma[[peptide]][[pair]][length(BackgroundSumPlasma[[peptide]][[pair]]):1] / BackgroundSumPlasma[[peptide]][[pair]]
     
+<<<<<<< HEAD
     #### AUC calculation 
+=======
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
     m <- ggplot(as.data.frame(RatioPlasma[[peptide]][[pair]]), aes(x = as.numeric(RatioPlasma[[peptide]][[pair]]))) 
     m <- m + geom_density() 
     p <- ggplot_build(m)
@@ -984,8 +1268,12 @@ for(peptide in peptidesPlasma[1]){
       annotate("text", label = paste("sd = ", round(sd(RatioPlasma[[peptide]][[pair]], na.rm = T),2)),
                x = max(RatioPlasma[[peptide]][[pair]], na.rm = T) - max(RatioPlasma[[peptide]][[pair]], na.rm = T)/10, y = y_max - 4*y_max/10,hjust = 1)
     
+<<<<<<< HEAD
     plotStatsPlasma[[peptide]][[pair]] <- ggplot(subset(StatsDataFramePlasma[[peptide]][[pair]], !(StatsDataFramePlasma[[peptide]][[pair]]$X2 %in%
                                                                                                      c("Median of a MaxScore/Background ratio"))),
+=======
+    plotStatsPlasma[[peptide]][[pair]] <- ggplot(subset(StatsDataFramePlasma[[peptide]][[pair]], !(StatsDataFramePlasma[[peptide]][[pair]]$X2 %in% c("Median of a MaxScore/Background ratio"))),
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
                                            aes(x = X2, y = as.numeric(as.character(X1)))) +
       geom_bar(stat = "identity", fill = "darkblue") +
       labs( x = "",
@@ -997,7 +1285,11 @@ for(peptide in peptidesPlasma[1]){
     
     # save plots to pdf
     print(grid.arrange(plotAlignedChroms(StrepChromsPlasma, pair, peptide, StrepAnnotPlasma, #AlignErrorinSec,
+<<<<<<< HEAD
                                          AlignedIndices[[peptide]][[pair]], tA, tB, FourOrTwo = TRUE),
+=======
+                                         AlignedIndices, tA, tB, FourOrTwo = TRUE),
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
                 grid.arrange(plotsRatioPlasma[[peptide]][[pair]], plotStatsPlasma[[peptide]][[pair]], ncol = 2),
                        ncol =1))
     
@@ -1005,23 +1297,46 @@ for(peptide in peptidesPlasma[1]){
   dev.off()
 }
 
+<<<<<<< HEAD
 # Clustering using the score matrices produced as a result of the chosen distance (1+NGaps)/AUC
 Clusters1Peptide <- list()
+=======
+Clusters10Peptides <- list()
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
 DistMatrices <- list()
 pdf(paste("Trees_24runsPlasma_10peptides_upgma_GapsAUC.pdf"))
 for(peptide in peptidesPlasma) {
   print(peptide)
   DistMatrices[[peptide]] = as.dist(Score24runsPlasmaMatrices[[peptide]], diag = TRUE)
+<<<<<<< HEAD
   Clustered <- hclust(DistMatrices[[peptide]], method = "average")
   my_tree <- as.phylo(Clustered) 
   plot(my_tree,main = peptide,label.offset = 0.01)
   
   # save tree in the newick format
+=======
+  Clustered <- hclust(DistMat, method = "average")
+  # for (i in 23:2) {
+  #   Clusters20Peptides[[peptide]][[i]] <- cutree(Clustered, k = i)
+  # }
+  my_tree <- as.phylo(Clustered) 
+  
+  # colors = c("red", "blue", "green", "black", "violet", "orange", "darkgray", "darkblue","darkgreen","darkred", "brown")
+  # clus4 = cutree(Clustered, k = 17)
+  plot(my_tree,main = peptide,label.offset = 0.01)
+       #tip.color = colors[clus4], label.offset = 0.01, cex = 0.8)
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
   #write.tree(phy=my_tree, file= paste(gsub("/","-",peptide),"_plasma_tree.newick", sep = ""))
 }
 dev.off()
 
+<<<<<<< HEAD
 # Weights obtained from the tree
+=======
+### First  plasma22-3 and 11-14. then 11-14-23, then 11-14-23-22-3 
+### Secondly, plasma-17-6, 10-2 --> 17-6-10-2, then 8 and 16-12 --> 8-16-12 and then join: 17-6-10-2-8-16-12
+# Intensities
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
 Weights <- list()
 weights <- read.table("weights_116795_TFISPIK-2.output", sep = "\t", header = F)
 rownames(weights) <- weights[,1]
@@ -1029,6 +1344,7 @@ weights[,1] <- NULL
 Weights[[peptide]] <- weights
 
 peptide <- "116795_TFISPIK/2"
+<<<<<<< HEAD
 
 ### UPGMA algorithm to save the sequence of merging runs within the tree
 ### Gives as an output list like: (A, AB, CD, ABCD, ABCDE, KF, KFX, ABCDEKFX)
@@ -1127,10 +1443,24 @@ labels <- c()
 MergingSequenceLabels <- UPGMA(ScoreMatrix, labels)
 
 
+=======
+run1 <- "Plasma17"
+run2 <- "Plasma6"
+run3 <- "Plasma3"
+run4 <- "Plasma22"
+run5 <- "Plasma11"
+run6 <- "Plasma14"
+run7 <- "Plasma23"
+run8 <- "Plasma10"
+run9 <- "Plasma2"
+
+RT_average <- list()
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
 Intensity <- list()
 Intensity_mean <- list()
 Intensity_median <- list()
 Intensity_weightedmean <- list()
+<<<<<<< HEAD
 mergedStrepChromsPlasma <- list()
 
 ########################################################
@@ -1525,6 +1855,388 @@ mergedStrepChromsPlasmaSkipNAs <- readRDS("mergedStrepChromsSkipNAs_with_Plasma1
 mergedStrepChromsPlasmaRandomNAs <- readRDS("mergedStrepChromsRandomNAs_with_Plasma1_Plasma21_Plasma3_Plasma22_Plasma23_Plasma11_Plasma14_Plasma0_Plasma19_Plasma7_Plasma20_Plasma5_Plasma18_Plasma8_Plasma16_Plasma12_Plasma10_Plasma2_Plasma17_Plasma6_Plasma4_Plasma9_116795_TFISPIK-2.rds")
 
 
+=======
+Intensities <- list()
+mergedStrepChromsPlasma <- list()
+AllmergedStrepChromsPlasma <- list()
+for (i in 1:6) {
+  AllmergedStrepChromsPlasma[[peptide]][[i]] <- StrepChromsPlasma[["Plasma11"]]
+}
+### merge plasma11 and 14
+# align them first 
+pair <- "Plasma11_Plasma14"
+run_pair <-   strsplit(pair, split = "_")[[1]]
+gapQuantile <- 0.5; goFactor <- 1/8; geFactor <- 40
+simMeasure <- "dotProductMasked"
+s <- getSimilarityMatrix(StrepChromsPlasma, peptide, run_pair[1], run_pair[2], type = simMeasure)
+gapPenalty <- getGapPenalty(s, gapQuantile, type = simMeasure)
+if (round(gapPenalty,2) == 0) {
+  while (gapPenalty < 0.01) {
+    gapQuantile <- gapQuantile + 0.1
+    gapPenalty <- getGapPenalty(s, gapQuantile, type = simMeasure)
+  }
+}
+
+Alignobj <- getAffineAlignObj(s, go = gapPenalty*goFactor, ge = gapPenalty*geFactor)
+AlignedIndices[[peptide]][[pair]] <- getAlignment(Alignobj)
+timepointsNumber <- length(AlignedIndices[[peptide]][[pair]][[1]][,1])
+
+### calculate new intensities according to the relabeling model comnsidering all NAs
+# the index corresponding to the timepoint[j] in StrepChromsPlasma is AlignedIndices[[peptide]][[pair]][[1]][timepoint[j],1]
+for (i in 1:length(StrepChromsPlasma[[run_pair[1]]][[peptide]])) {
+  print(i)
+  Intensity[[peptide]][[pair]][[i]] <- c(rep(NA,195))
+  for (index in 1:timepointsNumber) {
+    print(index)
+    if (is.na(AlignedIndices[[peptide]][[pair]][[1]][index,1][[1]])) {
+      if (index <= TerminalNAnumber(AlignedIndices[[peptide]][[pair]][[1]][,1])[1])  {
+        Intensity[[peptide]][[pair]][[i]][index] <- mean(c(StrepChromsPlasma[[run_pair[1]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index,1][[1]], 2],
+                                                        StrepChromsPlasma[[run_pair[2]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index,2][[1]], 2]))
+      }
+      else if (index > (timepointsNumber - TerminalNAnumber(AlignedIndices[[peptide]][[pair]][[1]][,1])[2])) {
+        Intensity[[peptide]][[pair]][[i]][index] <- mean(c(StrepChromsPlasma[[run_pair[1]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][timepointsNumber - 
+                                                                                                    TerminalNAnumber(AlignedIndices[[peptide]][[pair]][[1]][, 1])[2], 1], 2],
+                                                       StrepChromsPlasma[[run_pair[2]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index, 2][[1]], 2]))
+
+      }
+      else {
+        Intensity[[peptide]][[pair]][[i]][index] <- mean(c(mean(c(StrepChromsPlasma[[run_pair[1]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index - 1,1][[1]], 2],
+                                                              StrepChromsPlasma[[run_pair[1]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index + 1,1][[1]], 2])),
+                                                  StrepChromsPlasma[[run_pair[2]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index,2][[1]], 2] ))
+        }
+    }
+  
+    else if (!is.na(AlignedIndices[[peptide]][[pair]][[1]][index, 1][[1]]))  {
+      if (!is.na(AlignedIndices[[peptide]][[pair]][[1]][index, 2][[1]])) {
+        Intensity[[peptide]][[pair]][[i]][index] <- mean(c(StrepChromsPlasma[[run_pair[1]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index,1][[1]], 2],
+                                                         StrepChromsPlasma[[run_pair[2]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index,2][[1]], 2]))
+        }
+      if (is.na(AlignedIndices[[peptide]][[pair]][[1]][index, 2])) {
+        if (index <= TerminalNAnumber(AlignedIndices[[peptide]][[pair]][[1]][,2])[1])  {
+          Intensity[[peptide]][[pair]][[i]][index] <- mean(c(StrepChromsPlasma[[run_pair[1]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index,1][[1]], 2],
+                                                           StrepChromsPlasma[[run_pair[2]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index,2][[1]], 2]))
+        }
+        else if (index > (timepointsNumber - TerminalNAnumber(AlignedIndices[[peptide]][[pair]][[1]][,2])[2])) {
+          Intensity[[peptide]][[pair]][[i]][index] <- mean(c(StrepChromsPlasma[[run_pair[1]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index,1][[1]], 2],
+                                                             StrepChromsPlasma[[run_pair[2]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index, 2][[1]] -
+                                                                                    TerminalNAnumber(AlignedIndices[[peptide]][[pair]][[1]][, 2])[2], 2]))
+          
+        }
+               
+        else {
+          Intensity[[peptide]][[pair]][[i]][index] <- mean(c(mean(c(StrepChromsPlasma[[run_pair[2]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index - 1,2][[1]], 2],
+                                                                StrepChromsPlasma[[run_pair[2]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index + 1,2][[1]], 2])),
+                                                           StrepChromsPlasma[[run_pair[1]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index,1][[1]], 2] ))
+        }
+      }
+    
+    }
+     
+  }
+
+  
+  
+  
+  # Intensities[[peptide]][[i]] <- cbind(StrepChromsPlasma[[run5]][[peptide]][[i]][, 2], StrepChromsPlasma[[run6]][[peptide]][[i]][, 2])
+  # RT_average[[peptide]][[run]][[i]] <- rowMeans(cbind(StrepChromsPlasma[[run5]][[peptide]][[i]][, 1], StrepChromsPlasma[[run6]][[peptide]][[i]][, 1]))
+  # RT_average[[peptide]][[run]][[i]] <- seq(min(RT_average[[peptide]][[run]][[i]]), max(RT_average[[peptide]][[run]][[i]]),
+  #                                          (max(RT_average[[peptide]][[run]][[i]]) - min(RT_average[[peptide]][[run]][[i]])) / timepointsNumber)
+  # Intensity_mean[[peptide]][[pair]][[i]] <- rowMeans(Intensity[[peptide]][[pair]][[i]])
+  # Intensity_median[[peptide]][[run]][[i]] <- apply(Intensities[[peptide]][[i]], 1, median)
+  # Intensity_weightedmean[[peptide]][[run]][[i]] <- rowMeans(cbind(Weights[[peptide]][run5,] * StrepChromsPlasma[[run5]][[peptide]][[i]][, 2],
+                                 #  Weights[[peptide]][run6,] * StrepChromsPlasma[[run6]][[peptide]][[i]][, 2]))
+  
+ 
+  # mergedStrepChromsPlasma[[pair]][[peptide]][[i]] <- data.frame(cbind(c(1:timepointsNumber), Intensity[[peptide]][[pair]][[i]]))
+                                                                  # Intensity_median[[peptide]][[run]][[i]], Intensity_weightedmean[[peptide]][[run]][[i]]))
+
+  # or resample back to 195 points:
+  interpolation <- approx(mergedStrepChromsPlasma[["Plasma11_Plasma14"]][[peptide]][[i]][,2],
+                          method = "linear",
+                          n = 195)
+  mergedStrepChromsPlasma[[pair]][[peptide]][[i]] <- data.frame(cbind(c(1:195), interpolation$y))
+}
+
+
+
+BeforeMerge <- grid.arrange(plotChromatogram(StrepChromsPlasma, run_pair[1],peptide,StrepAnnotPlasma,TRUE),
+             plotChromatogram(StrepChromsPlasma,run_pair[2],peptide,StrepAnnotPlasma, TRUE), ncol = 2)
+grid.arrange(BeforeMerge, 
+             plotChromatogramMerged(mergedStrepChromsPlasma,pair,peptide, type = "Mean", TRUE))
+              #plotChromatogramMerged(mergedStrepChromsPlasma,run,peptide, type = "Median", TRUE),
+              #plotChromatogramMerged(mergedStrepChromsPlasma,run,peptide, type = "WeightedMean", TRUE), ncol = 1)
+             
+### merge plasma11-14 with plasma23
+# first do the alignment 
+
+run_pair <- c( "Plasma23", "Plasma11_Plasma14")
+pair <- paste(run_pair[1],run_pair[2], sep = "_")
+gapQuantile <- 0.5; goFactor <- 1/8; geFactor <- 40
+simMeasure <- "dotProductMasked"
+s <- getSimilarityMatrix_forMerged(StrepChromsPlasma, mergedStrepChromsPlasma, peptide, run_pair[1], run_pair[2], type = simMeasure)
+gapPenalty <- getGapPenalty(s, gapQuantile, type = simMeasure)
+if (round(gapPenalty,2) == 0) {
+  while (gapPenalty < 0.01) {
+    gapQuantile <- gapQuantile + 0.1
+    gapPenalty <- getGapPenalty(s, gapQuantile, type = simMeasure)
+  }
+}
+
+Alignobj <- getAffineAlignObj(s, go = gapPenalty*goFactor, ge = gapPenalty*geFactor)
+AlignedIndices[[peptide]][[pair]] <- getAlignment(Alignobj)
+timepointsNumber <- length(AlignedIndices[[peptide]][[pair]][[1]][,1]) # - 
+ # max(TerminalNAnumber(AlignedIndices[[peptide]][[pair]][[1]][,1])[1], TerminalNAnumber(AlignedIndices[[peptide]][[pair]][[1]][,2])[1]) -
+ # max(TerminalNAnumber(AlignedIndices[[peptide]][[pair]][[1]][,1])[2], TerminalNAnumber(AlignedIndices[[peptide]][[pair]][[1]][,2])[2]) 
+
+
+for (i in 1:length(StrepChromsPlasma[[run_pair[1]]][[peptide]])) {
+  print(i)
+  Intensity[[peptide]][[pair]][[i]] <- c(rep(NA,195))
+  for (index in 1:timepointsNumber) {
+    print(index)
+    if (is.na(AlignedIndices[[peptide]][[pair]][[1]][index,1][[1]])) {
+      if (index <= TerminalNAnumber(AlignedIndices[[peptide]][[pair]][[1]][,1])[1])  {
+        Intensity[[peptide]][[pair]][[i]][index] <- mean(c(StrepChromsPlasma[[run_pair[1]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][1 + TerminalNAnumber(AlignedIndices[[peptide]][[pair]][[1]][, 1])[1],1][[1]], 2],
+                                                           mergedStrepChromsPlasma[[run_pair[2]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index,2][[1]], 2]))
+      }
+      else if (index > (timepointsNumber - TerminalNAnumber(AlignedIndices[[peptide]][[pair]][[1]][,1])[2])) {
+        Intensity[[peptide]][[pair]][[i]][index] <- mean(c(StrepChromsPlasma[[run_pair[1]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][timepointsNumber - 
+                                                                                                                                                     TerminalNAnumber(AlignedIndices[[peptide]][[pair]][[1]][, 1])[2], 1], 2],
+                                                           mergedStrepChromsPlasma[[run_pair[2]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index, 2][[1]], 2]))
+        
+      }
+      else {
+        Intensity[[peptide]][[pair]][[i]][index] <- mean(c(mean(c(StrepChromsPlasma[[run_pair[1]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index - 1,1][[1]], 2],
+                                                                  StrepChromsPlasma[[run_pair[1]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index + 1,1][[1]], 2])),
+                                                           mergedStrepChromsPlasma[[run_pair[2]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index,2][[1]], 2] ))
+      }
+    }
+    
+    else if (!is.na(AlignedIndices[[peptide]][[pair]][[1]][index, 1][[1]]))  {
+      if (!is.na(AlignedIndices[[peptide]][[pair]][[1]][index, 2][[1]])) {
+        Intensity[[peptide]][[pair]][[i]][index] <- mean(c(StrepChromsPlasma[[run_pair[1]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index,1][[1]], 2],
+                                                           mergedStrepChromsPlasma[[run_pair[2]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index,2][[1]], 2]))
+      }
+      if (is.na(AlignedIndices[[peptide]][[pair]][[1]][index, 2])) {
+        if (index <= TerminalNAnumber(AlignedIndices[[peptide]][[pair]][[1]][,2])[1])  {
+          Intensity[[peptide]][[pair]][[i]][index] <- mean(c(StrepChromsPlasma[[run_pair[1]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index,1][[1]], 2],
+                                                             mergedStrepChromsPlasma[[run_pair[2]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index,2][[1]], 2]))
+        }
+        else if (index > (timepointsNumber - TerminalNAnumber(AlignedIndices[[peptide]][[pair]][[1]][,2])[2])) {
+          Intensity[[peptide]][[pair]][[i]][index] <- mean(c(StrepChromsPlasma[[run_pair[1]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index,1][[1]], 2],
+                                                             mergedStrepChromsPlasma[[run_pair[2]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index, 2][[1]] -
+                                                                                                                TerminalNAnumber(AlignedIndices[[peptide]][[pair]][[1]][, 2])[2], 2]))
+          
+        }
+        
+        else {
+          Intensity[[peptide]][[pair]][[i]][index] <- mean(c(mean(c(mergedStrepChromsPlasma[[run_pair[2]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index - 1,2][[1]], 2],
+                                                                    mergedStrepChromsPlasma[[run_pair[2]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index + 1,2][[1]], 2])),
+                                                             StrepChromsPlasma[[run_pair[1]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][index,1][[1]], 2] ))
+        }
+      }
+      
+    }
+    
+  }
+
+  
+  # 
+  # Intensity_mean[[peptide]][[pair]][[i]] <- rowMeans(Intensities[[peptide]][[i]])
+  # Intensity_median[[peptide]][[pair]][[i]] <- apply(Intensities[[peptide]][[i]], 1, median)
+  # Intensity_weightedmean[[peptide]][[pair]][[i]] <- rowMeans(cbind(Weights[[peptide]][run5,] * StrepChromsPlasma[[run5]][[peptide]][[i]][, 2],
+  #                                                                 Weights[[peptide]][run6,] * StrepChromsPlasma[[run6]][[peptide]][[i]][, 2],
+  #                                                                 Weights[[peptide]][run7,] * StrepChromsPlasma[[run7]][[peptide]][[i]][, 2]))
+  # 
+  mergedStrepChromsPlasma[[pair]][[peptide]][[i]] <- data.frame(cbind(c(1:timepointsNumber), Intensity[[peptide]][[pair]][[i]]))
+                                                                      #Intensity_mean[[peptide]][[pair]][[i]], 
+                                                                    #Intensity_median[[peptide]][[pair]][[i]], Intensity_weightedmean[[peptide]][[pair]][[i]]))
+  
+}
+
+AllmergedStrepChromsPlasma[[peptide]][[i]] 
+
+BeforeMerge <- grid.arrange(plotChromatogramMerged(mergedStrepChromsPlasma, "Plasma11_Plasma14",peptide,type = "Mean",TRUE) ,
+                            #plotChromatogramMerged(mergedStrepChromsPlasma, run,peptide,type = "Median",TRUE),
+                            #plotChromatogramMerged(mergedStrepChromsPlasma, run,peptide,type = "WeightedMean",TRUE),
+                            plotChromatogram(StrepChromsPlasma,"Plasma23",peptide,StrepAnnotPlasma, TRUE), ncol = 2)
+pdf(paste("ChromsMergedPlasma11_14_23.pdf"))
+grid.arrange(BeforeMerge, 
+             plotChromatogramMerged(mergedStrepChromsPlasma,pair,peptide, type = "Mean", TRUE)) #,
+             #plotChromatogramMerged(mergedStrepChromsPlasma,pair,peptide, type = "Median", TRUE),
+             #plotChromatogramMerged(mergedStrepChromsPlasma,pair,peptide, type = "WeightedMean", TRUE), ncol = 1)
+
+dev.off()
+
+### merge Plasma 3-22
+# first do the alignment 
+run_pair <- c( "Plasma3", "Plasma22")
+pair <- paste(run_pair[1],run_pair[2], sep = "_")
+gapQuantile <- 0.5; goFactor <- 1/8; geFactor <- 40
+simMeasure <- "dotProductMasked"
+s <- getSimilarityMatrix(StrepChromsPlasma, peptide, run_pair[1], run_pair[2], type = simMeasure)
+gapPenalty <- getGapPenalty(s, gapQuantile, type = simMeasure)
+if (round(gapPenalty,2) == 0) {
+  while (gapPenalty < 0.01) {
+    gapQuantile <- gapQuantile + 0.1
+    gapPenalty <- getGapPenalty(s, gapQuantile, type = simMeasure)
+  }
+}
+
+Alignobj <- getAffineAlignObj(s, go = gapPenalty*goFactor, ge = gapPenalty*geFactor)
+AlignedIndices[[peptide]][[pair]] <- getAlignment(Alignobj)
+timepointsNumber <- length(AlignedIndices[[peptide]][[pair]][[1]][,1])
+
+run <- paste(run3,run4, sep = "_")
+for (i in 1:length(StrepChromsPlasma[[run3]][[peptide]])) {
+  Intensities[[peptide]][[i]] <- cbind(StrepChromsPlasma[[run3]][[peptide]][[i]][, 2], StrepChromsPlasma[[run4]][[peptide]][[i]][, 2])
+  RT_average[[peptide]][[run]][[i]] <- rowMeans(cbind(StrepChromsPlasma[[run3]][[peptide]][[i]][, 1], StrepChromsPlasma[[run4]][[peptide]][[i]][, 1]))
+  RT_average[[peptide]][[run]][[i]] <- seq(min(RT_average[[peptide]][[run]][[i]]), max(RT_average[[peptide]][[run]][[i]]),
+                                           (max(RT_average[[peptide]][[run]][[i]]) - min(RT_average[[peptide]][[run]][[i]])) / timepointsNumber)
+  Intensity_mean[[peptide]][[run]][[i]] <- rowMeans(Intensities[[peptide]][[i]])
+  Intensity_median[[peptide]][[run]][[i]] <- apply(Intensities[[peptide]][[i]], 1, median)
+  Intensity_weightedmean[[peptide]][[run]][[i]] <- rowMeans(cbind(Weights[[peptide]][run3,] * StrepChromsPlasma[[run3]][[peptide]][[i]][, 2],
+                                                                  Weights[[peptide]][run4,] * StrepChromsPlasma[[run4]][[peptide]][[i]][, 2]))
+  
+  mergedStrepChromsPlasma[[run]][[peptide]][[i]] <- data.frame(cbind(RT_average[[peptide]][[run]][[i]], Intensity_mean[[peptide]][[run]][[i]], 
+                                                                    Intensity_median[[peptide]][[run]][[i]], Intensity_weightedmean[[peptide]][[run]][[i]]))
+  
+}
+
+BeforeMerge <- grid.arrange(plotChromatogram(StrepChromsPlasma, run3,peptide,StrepAnnotPlasma,TRUE),
+                            plotChromatogram(StrepChromsPlasma,run4,peptide,StrepAnnotPlasma, TRUE), ncol = 2)
+pdf(paste("ChromsMergedPlasma3_22.pdf"))
+#print(BeforeMerge)
+print(grid.arrange(BeforeMerge, 
+             plotChromatogramMerged(mergedStrepChromsPlasma,run,peptide, type = "Mean", TRUE),
+             plotChromatogramMerged(mergedStrepChromsPlasma,run,peptide, type = "Median", TRUE),
+             plotChromatogramMerged(mergedStrepChromsPlasma,run,peptide, type = "WeightedMean", TRUE), ncol = 1))
+dev.off()
+
+
+
+### merge Plasma3_22 with Plasma11_14_23
+# first alignment
+
+run_pair <- c("Plasma3_Plasma22", "Plasma11_Plasma14_Plasma23")
+pair <- paste(run_pair[1],run_pair[2], sep = "_")
+gapQuantile <- 0.5; goFactor <- 1/8; geFactor <- 40
+simMeasure <- "dotProductMasked"
+s <- getSimilarityMatrix(mergedStrepChromsPlasma, peptide, run_pair[1], run_pair[2], type = simMeasure)
+gapPenalty <- getGapPenalty(s, gapQuantile, type = simMeasure)
+if (round(gapPenalty,2) == 0) {
+  while (gapPenalty < 0.01) {
+    gapQuantile <- gapQuantile + 0.1
+    gapPenalty <- getGapPenalty(s, gapQuantile, type = simMeasure)
+  }
+}
+
+Alignobj <- getAffineAlignObj(s, go = gapPenalty*goFactor, ge = gapPenalty*geFactor)
+AlignedIndices[[peptide]][[pair]] <- getAlignment(Alignobj)
+timepointsNumber <- length(AlignedIndices[[peptide]][[pair]][[1]][,1])
+
+pair <- pair
+for (i in 1:length(StrepChromsPlasma[[run7]][[peptide]])) {
+  Intensities[[peptide]][[i]] <- cbind(mergedStrepChromsPlasma[[run_pair[1]]][[peptide]][[i]][, 2], mergedStrepChromsPlasma[[run_pair[2]]][[peptide]][[i]][, 2])
+  RT_average[[peptide]][[pair]][[i]] <- rowMeans(cbind(mergedStrepChromsPlasma[[run_pair[2]]][[peptide]][[i]][, 1], mergedStrepChromsPlasma[[run_pair[1]]][[peptide]][[i]][, 1]))
+  RT_average[[peptide]][[pair]][[i]] <- seq(min(RT_average[[peptide]][[pair]][[i]]), max(RT_average[[peptide]][[pair]][[i]]),
+                                           (max(RT_average[[peptide]][[pair]][[i]]) - min(RT_average[[peptide]][[pair]][[i]])) / timepointsNumber)
+  
+  Intensity_mean[[peptide]][[pair]][[i]] <- rowMeans(Intensities[[peptide]][[i]])
+  Intensity_median[[peptide]][[pair]][[i]] <- apply(Intensities[[peptide]][[i]], 1, median)
+  Intensity_weightedmean[[peptide]][[pair]][[i]] <- rowMeans(cbind(Weights[[peptide]][run3,] * StrepChromsPlasma[[run3]][[peptide]][[i]][, 2],
+                                                                        Weights[[peptide]][run4,] * StrepChromsPlasma[[run4]][[peptide]][[i]][, 2],
+                                                                        Weights[[peptide]][run5,] * StrepChromsPlasma[[run5]][[peptide]][[i]][, 2],
+                                                                        Weights[[peptide]][run6,] * StrepChromsPlasma[[run6]][[peptide]][[i]][, 2],
+                                                                        Weights[[peptide]][run7,] * StrepChromsPlasma[[run7]][[peptide]][[i]][, 2]))
+  
+  mergedStrepChromsPlasma[[pair]][[peptide]][[i]] <- data.frame(cbind(RT_average[[peptide]][[pair]][[i]], Intensity_mean[[peptide]][[pair]][[i]], 
+                                                                          Intensity_median[[peptide]][[pair]][[i]], Intensity_weightedmean[[peptide]][[pair]][[i]]))
+  
+}
+
+BeforeMerge <- grid.arrange(plotChromatogramMerged(mergedStrepChromsPlasma, "Plasma11_Plasma14_Plasma23",peptide,type = "Mean",TRUE),
+                            plotChromatogramMerged(mergedStrepChromsPlasma, "Plasma3_Plasma22",peptide,type = "Mean",TRUE),
+                            plotChromatogramMerged(mergedStrepChromsPlasma, "Plasma11_Plasma14_Plasma23",peptide,type = "Median",TRUE),
+                            plotChromatogramMerged(mergedStrepChromsPlasma, "Plasma3_Plasma22",peptide,type = "Median",TRUE),
+                            plotChromatogramMerged(mergedStrepChromsPlasma, "Plasma11_Plasma14_Plasma23",peptide,type = "WeightedMean",TRUE),
+                            plotChromatogramMerged(mergedStrepChromsPlasma, "Plasma3_Plasma22",peptide,type = "WeightedMean",TRUE),ncol = 2)
+                            #plotChromatogramMerged(mergedStrepChromsPlasma, run,peptide,type = "WeightedMean",TRUE),
+                            #plotChromatogram(StrepChromsPlasma,run7,peptide,StrepAnnotPlasma, TRUE), ncol = 4)
+pdf(paste("ChromsBeforeMergedPlasma3_22and11_14_23.pdf"))
+grid.arrange(plotChromatogramMerged(mergedStrepChromsPlasma, "Plasma11_Plasma14_Plasma23",peptide,type = "Mean",TRUE),
+             plotChromatogramMerged(mergedStrepChromsPlasma, "Plasma3_Plasma22",peptide,type = "Mean",TRUE),
+             plotChromatogramMerged(mergedStrepChromsPlasma, "Plasma11_Plasma14_Plasma23",peptide,type = "Median",TRUE),
+             plotChromatogramMerged(mergedStrepChromsPlasma, "Plasma3_Plasma22",peptide,type = "Median",TRUE),
+             plotChromatogramMerged(mergedStrepChromsPlasma, "Plasma11_Plasma14_Plasma23",peptide,type = "WeightedMean",TRUE),
+             plotChromatogramMerged(mergedStrepChromsPlasma, "Plasma3_Plasma22",peptide,type = "WeightedMean",TRUE),ncol = 2)
+dev.off()
+
+pdf(paste("ChromsMergedPlasma3_22and11_14_23.pdf"))
+print(grid.arrange(#BeforeMerge, 
+             plotChromatogramMerged(mergedStrepChromsPlasma,pair,peptide, type = "Mean", TRUE),
+             plotChromatogramMerged(mergedStrepChromsPlasma,pair,peptide, type = "Median", TRUE),
+             plotChromatogramMerged(mergedStrepChromsPlasma,pair,peptide, type = "WeightedMean", TRUE), ncol = 1))
+
+dev.off()
+
+## save some plots 
+require(MESS)
+#for (peptide in peptidenames) {
+for(peptide in "55855_TGAQELLR/2"){
+  plotsPlasma[[peptide]] <- ggplot(ScoreDataFramesPlasma[[peptide]], aes(x = as.numeric(Score), colour = Type, fill = Type)) +
+    geom_density(alpha = 0.3) +
+    labs(x = "Score") +
+    theme(legend.title = element_blank())
+  
+  m <- ggplot(as.data.frame(RatioPlasma[[peptide]]), aes(x = as.numeric(RatioPlasma[[peptide]]))) 
+  m <- m + geom_density() 
+  p <- ggplot_build(m)
+  y_max <- max(p$data[[1]]$y)
+  AUC[[peptide]] <- auc(p$data[[1]]$x,p$data[[1]]$y)
+  
+  plotsRatioPlasma[[peptide]] <- ggplot(as.data.frame(RatioPlasma[[peptide]]), aes(x = as.numeric(RatioPlasma[[peptide]]))) +   
+    geom_density(alpha = 0.3, color = "darkblue", fill = "darkblue") +
+    labs(x = "Maximum score at each step /
+         Background sum (4x4)") +
+    theme(axis.title.y = element_text(size = 7),
+          axis.title.x = element_text(size = 6)) +
+    annotate("text", label = paste("AUC = ", round(AUC[[peptide]],2)), x = max(RatioPlasma[[peptide]], na.rm = T) - 
+               max(RatioPlasma[[peptide]], na.rm = T)/10, y_max - y_max/10, hjust = 1) +
+    annotate("text", label = paste("mean = ", round(mean(RatioPlasma[[peptide]],na.rm = T),2)),
+             x = max(RatioPlasma[[peptide]], na.rm = T) - max(RatioPlasma[[peptide]], na.rm = T)/10, y = y_max - 2*y_max/10,hjust = 1) +
+    annotate("text", label = paste("sd = ", round(sd(RatioPlasma[[peptide]], na.rm = T),2)),
+             x = max(RatioPlasma[[peptide]], na.rm = T) - max(RatioPlasma[[peptide]], na.rm = T)/10, y = y_max - 3*y_max/10,hjust = 1)
+  
+  plotStatsPlasma[[peptide]] <-   ggplot(subset(StatsDataFramePlasma[[peptide]], !(StatsDataFramePlasma[[peptide]]$V2 %in% c("Median of a MaxScore/Background ratio"))),
+                                   aes(x = V2, y = as.numeric(as.character(score)))) +
+    geom_bar(stat = "identity", fill = "darkblue") +
+    labs( x = "",
+          y = "") +
+    theme(axis.text.y = element_text(size = 7),
+          axis.text.x = element_text(size = 6)) 
+  
+
+}
+
+require(lattice)
+statplotsPlasma <- list()
+#for(peptide in peptidenames) {
+for(peptide in "55855_TGAQELLR/2"){
+  statplotsPlasma[[peptide]] <- grid.arrange(plotsRatioPlasma[[peptide]], plotStatsPlasma[[peptide]], ncol = 2)
+  print(statplotsPlasma[[peptide]])
+}
+
+pdf(paste("ChromAndDistribAndStats_PlasmaRun13-18_55855Peptide_4x4background.pdf"))
+#for(peptide in peptidenames) {
+for(peptide in "116795_TFISPIK/2"){
+  print(grid.arrange(plotChromatogram(StrepChromsPlasma, "Plasma1", peptide,StrepAnnotPlasma, printTitle =TRUE ),
+                     plotChromatogram(StrepChromsPlasma, "Plasma11", peptide,StrepAnnotPlasma, printTitle =TRUE ),
+                     #statplotsPlasma[[peptide]],
+                     ncol =1))
+}
+dev.off()
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
 
 ######## Get RSE and create a distance table
 samples4gradient <- 100; RSEdistFactor <- 3.5; hardConstrain <- FALSE
@@ -1555,7 +2267,10 @@ for (i in 1:length(globalStrep["RSE",])) {
                  strsplit(strsplit(rownames(as.data.frame(globalStrep["RSE",])), '_')[[i]], " ")[[1]] ] <- globalStrep["RSE",i]
 }
 
+<<<<<<< HEAD
 ## Build a global tree for 24 runs (plasma) based on LOESS prediction
+=======
+>>>>>>> 224020160891c3d69307718a07f5dc14f4ae447b
 DistMatPlasma = as.dist(RSErunsPlasmaMatrix, diag = TRUE)
 ClusteredPlasma <- hclust(DistMatPlasma, method = "average")
 library(ape)
