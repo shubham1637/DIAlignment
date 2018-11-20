@@ -3,18 +3,15 @@ title: "DIAlignment_UtkinaI_Rotation2"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
 # change the path to your directory here:
 knitr::knit("/Users/utkinaira/Desktop/Study/UofT/HRoest_rotation2")
 ```
 
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
-
 1. Download the package 'DIAlign'.
 
-``` {r }
+``` {r, echo=FALSE }
 library(devtools)
 library(ggplot2)
 library(reshape2)
@@ -316,6 +313,7 @@ SumNearMaxScores <- function(alignObj) {
   return(SumNearMax)
 }
 ```
+
 3. Functions  for plotting aligned and not aligned chromatograms for single runs:
 ```{r}
 plotChromatogram <- function(data, runname, peptide, ObservedRT, printTitle = TRUE){
@@ -424,7 +422,7 @@ for (peptide in peptides) {
 ```
 
 # Fit a local alignment between chromatogram groups
-```{r}
+```{r, results = 'hide'}
 pair_names <- vector(); AUC <- list()
 for (i in 1:(length(runs)-1)){
   for (j in (i+1): length(runs)){
@@ -539,7 +537,7 @@ for(peptide in peptides){
 }
 ```
 
-```{r}
+```{r, results = 'hide'}
 # save plots 
 for (peptide in peptidenames) {
   plots[[peptide]] <- ggplot(ScoreDataFrames[[peptide]], aes(x = as.numeric(Score), colour = Type, fill = Type)) +
@@ -585,7 +583,7 @@ for(peptide in peptidenames) {
 ```
 
 Save plots to pdf.
-```{r}
+```{r, results = 'hide'}
 pdf(paste("ChromAndDistribAndStats_run1-2_4x4background.pdf"))
 for(peptide in peptidenames) {
   print(grid.arrange(plotChromatogram(StrepChroms, "run1", peptide,StrepAnnot, printTitle =TRUE ),
@@ -598,7 +596,7 @@ dev.off()
 
 
 ## Repeat the local alignment and building plots with 25 pairs of random peptides from different runs. 
-```{r}
+```{r, results = 'hide'}
 gapQuantile <- 0.5; goFactor <- 1/8; geFactor <- 40
 simMeasure <- "dotProductMasked"
 run_pair <- c("run2", "run3")
@@ -651,7 +649,7 @@ for (peptideA in PeptidesA){
 }
 ```
 
-```{r}
+```{r, results = 'hide'}
 # Same procedures as in previous blocks for Random peptides
 # from lists of cumulative scores create lists of separate max and background scores
 # and list of dataframes for each peptide (to create a plot)
@@ -730,7 +728,7 @@ for (peptide in peptidenamesRandom) {
 ```
 
 Save plots to pdf:
-```{r}
+```{r, results = 'hide'}
 statplotsRandom <- list()
 for(peptide in peptidenamesRandom) {
   statplotsRandom[[peptide]] <- grid.arrange(plotsRatioRandom[[peptide]], plotStatsRandom[[peptide]], ncol = 2)
@@ -751,7 +749,7 @@ dev.off()
 
 ```
 Hybrid alignment of chromatograms:
-```{r}
+```{r, results = 'hide'}
 samplingTime <-3.4 # In example dataset, all points are acquired at 3.4 second interval.
 samples4gradient <- 100; RSEdistFactor <- 3.5; hardConstrain <- FALSE
 pair_names <- vector(); 
@@ -772,7 +770,7 @@ meanRSE <- mean(globalStrep["RSE",])
 ```
 
 # Fit a global alignment function between runs.
-```{r}
+```{r, results = 'hide'}
 run_pair <- c("run1", "run2")
 loess.fit <- getLOESSfit(run_pair, peptides, oswOutStrep, 0.15)
 StrepAnnot <- as.data.frame(StrepAnnot) # output of openSWATH (extracted Features - RT)
@@ -807,8 +805,7 @@ my_tree <- as.phylo(Clustered)
 plot(my_tree)
 ```
 
-## Analysis of blood plasma dataset (24 runs, 406 peptides): building of a global and local trees (UPGMA algorithm), alignment and
-## merge of runs in an order according to the tree for each peptide
+## Analysis of blood plasma dataset (24 runs, 406 peptides): building of a global and local trees (UPGMA algorithm), alignment and merge of runs in an order according to the tree for each peptide
 
 ```{r}
 # Download the .rds files with raw data (chromatograms)
@@ -889,7 +886,7 @@ for (peptide in peptidesPlasma) {
 ```
 
 # Fit a local alignment between chromatogram groups
-```{r}
+```{r, results = 'hide'}
 pair_names <- vector(); runs <- names(StrepChromsPlasma)
 for (i in 1:(length(runsPlasma)-1)){
   for (j in (i+1): length(runsPlasma)){
@@ -1088,7 +1085,7 @@ Weights[[peptide]] <- weights
 ```
 
 ## Implementation of the UPGMA algorithm to save the sequence of merging runs within the tree
-## Gives as an output list like: (A, AB, CD, ABCD, ABCDE, KF, KFX, ABCDEKFX)
+Gives as an output list like: (A, AB, CD, ABCD, ABCDE, KF, KFX, ABCDEKFX)
 ```{r}
 # produce the appropriate type of an input matrix 
 ScoreMatrix <- as.matrix(Score24runsPlasmaMatrices[[1]])
@@ -1172,7 +1169,7 @@ join_table <- function(ScoreMatrix, a, b) {
 ```
 
 Finally, combine all the functions above and get sequence of merged labels.
-```{r}
+```{r, echo = FALSE }
 UPGMA <- function(ScoreMatrix, labels) {
   for (i in 1:(length(ScoreMatrix[1,]) - 1)) {
   # Locate lowest cell in the ScoreMatrix
@@ -1196,7 +1193,7 @@ MergingSequenceLabels <- UPGMA(ScoreMatrix, labels)
 
 
 ## Main function for merging
-```{r}
+```{r, results='hide'}
 Intensity <- list()
 Intensity_mean <- list()
 Intensity_median <- list()
@@ -1426,7 +1423,7 @@ data2[[run_pair[2]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][idx,
 ```
 
 Update (or download) mergedData:
-``` {r}
+``` {r, echo = FALSE}
 setwd("/Users/utkinaira/Desktop/Study/UofT/HRoest_rotation2/MergedChromPlasma_RDSfiles/")
 mergedStrepChromsPlasma <- readRDS("mergedStrepChroms_All.rds")
 mergedStrepChromsPlasmaSkipNAs <- readRDS("mergedStrepChromsSkipNAs_All.rds")
@@ -1435,7 +1432,7 @@ mergedStrepChromsPlasmaRandomNAs <- readRDS("mergedStrepChromsRandomNAs_All.rds"
 
 ## Perform Alignment and merging in order according to ```MergingSequenceLabels```
 This part of code is in progress
-``` {r}
+``` {r, results = 'hide'}
 for (i in 1:length(MergingSequenceLabels)) {
   if (length(strsplit(MergingSequenceLabels[i], "_")[[1]]) == 2) {
     # run in 3 different modes: model considering all NAs (allNAs = TRUE), model considering only terminal NAs (allNAs = FALSE, randomNAs = FALSE), and model considering random NAs (randomNAs = TRUE)
@@ -1490,17 +1487,12 @@ plotAllNAs <- AlignAndMergeRuns(StrepChromsPlasma, mergedStrepChromsPlasma, "Pla
 plotSkipNAs <- AlignAndMergeRuns(StrepChromsPlasma, mergedStrepChromsPlasmaSkipNAs, "Plasma5", "Plasma18", allNAs = FALSE, randomNAs = FALSE, peptide, newLengthofData = 195, typeOfRuns = "single", resample = TRUE)
 plotRandomNAs <- AlignAndMergeRuns(StrepChromsPlasma, mergedStrepChromsPlasmaRandomNAs, "Plasma5", "Plasma18", allNAs = FALSE, randomNAs = TRUE, peptide, newLengthofData = 195, typeOfRuns = "single", resample = TRUE)
 
-plot <- grid.arrange(plotAllNAs, plotSkipNAs, plotRandomNAs, ncol = 3)
-```
-
-```{r plot, echo=FALSE}
-plot(plot)
 ```
 
 
 
 # Perform a hybrid alignment and create a distance table based on RSE values obtained from LOESS prediction
-```{r}
+```{r,  results = 'hide'}
 samples4gradient <- 100; RSEdistFactor <- 3.5; hardConstrain <- FALSE
 pair_names <- vector(); runs <- names(StrepChromsPlasma)
 for (i in 1:(length(runs)-1)){
@@ -1531,7 +1523,7 @@ for (i in 1:length(globalStrep["RSE",])) {
 ```
 
 Build a global tree for 24 runs (plasma) based on LOESS prediction:
-```{r}
+```{r,  results = 'hide'}
 DistMatPlasma = as.dist(RSErunsPlasmaMatrix, diag = TRUE)
 ClusteredPlasma <- hclust(DistMatPlasma, method = "average")
 class(ClusteredPlasma) # must be hclust class
