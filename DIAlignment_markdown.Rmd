@@ -1,5 +1,5 @@
 ---
-title: "DIAlignment_UtkinaI_Rotation2"
+title: "DIAlignment (Utkina I.)"
 output: html_document
 ---
 
@@ -9,9 +9,9 @@ knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
 knitr::knit("/Users/utkinaira/Desktop/Study/UofT/HRoest_rotation2")
 ```
 
-1. Download the package 'DIAlign'.
+1. Download the package 'DIAlign' and all the necessary packages.
 
-``` {r, echo=FALSE }
+``` {r}
 library(devtools)
 library(ggplot2)
 library(reshape2)
@@ -29,7 +29,7 @@ library(DIAlign)
 ```
 
 
-## Introduce several functions that will be the modified versions of functions from the DIAlign considering alignment of merged runs and random peptides.
+## Introduce several functions that will be the modified versions of functions from the DIAlign considering alignment of merged runs and random peptides
 
 ```getSimilarityMatrix_forMerged``` - analogue of initial ```getSimilarityMatrix``` with one extra parameter ```dataMerged``` which corresponds to raw chromatogram data resulted from merging events. This function should be used when merging single run with already merged (i.e. A + BCD). ```runA``` within this function (and all functions included within the body of this one) is always a single run, ```runB``` is a result of merged runs.
 Originally parameter ```data``` stands for ```StrepChroms``` list from test set of 4 runs (included into the package).
@@ -421,7 +421,7 @@ for (peptide in peptides) {
 }
 ```
 
-# Fit a local alignment between chromatogram groups
+## Fit a local alignment between chromatogram groups
 ```{r, results = 'hide'}
 pair_names <- vector(); AUC <- list()
 for (i in 1:(length(runs)-1)){
@@ -595,7 +595,7 @@ dev.off()
 ```
 
 
-## Repeat the local alignment and building plots with 25 pairs of random peptides from different runs. 
+## Repeat the local alignment and building plots with 25 pairs of random peptides from different runs 
 ```{r, results = 'hide'}
 gapQuantile <- 0.5; goFactor <- 1/8; geFactor <- 40
 simMeasure <- "dotProductMasked"
@@ -728,7 +728,7 @@ for (peptide in peptidenamesRandom) {
 ```
 
 Save plots to pdf:
-```{r, results = 'hide'}
+```{r eval=FALSE, results = 'hide'}
 statplotsRandom <- list()
 for(peptide in peptidenamesRandom) {
   statplotsRandom[[peptide]] <- grid.arrange(plotsRatioRandom[[peptide]], plotStatsRandom[[peptide]], ncol = 2)
@@ -769,7 +769,7 @@ for(pair in pair_names){
 meanRSE <- mean(globalStrep["RSE",])
 ```
 
-# Fit a global alignment function between runs.
+## Fit a global alignment function between runs
 ```{r, results = 'hide'}
 run_pair <- c("run1", "run2")
 loess.fit <- getLOESSfit(run_pair, peptides, oswOutStrep, 0.15)
@@ -885,8 +885,8 @@ for (peptide in peptidesPlasma) {
 }
 ```
 
-# Fit a local alignment between chromatogram groups
-```{r, results = 'hide'}
+## Fit a local alignment between chromatogram groups
+```{r eval=FALSE, results = 'hide'}
 pair_names <- vector(); runs <- names(StrepChromsPlasma)
 for (i in 1:(length(runsPlasma)-1)){
   for (j in (i+1): length(runsPlasma)){
@@ -1044,7 +1044,7 @@ for(peptide in peptidesPlasma[1]){
 }
 ```
 
-``` {r, echo=FALSE}
+``` {r, echo = FALSE}
  plot(grid.arrange(plotAlignedChroms(StrepChromsPlasma, pair, peptide, StrepAnnotPlasma, #AlignErrorinSec,
                                          AlignedIndices[[peptide]][[pair]], tA, tB, FourOrTwo = TRUE),
                 grid.arrange(plotsRatioPlasma[[peptide]][[pair]], plotStatsPlasma[[peptide]][[pair]], ncol = 2),
@@ -1052,13 +1052,12 @@ for(peptide in peptidesPlasma[1]){
 ```
 
 Clustering using the score matrices produced as a result of the chosen distance (1+NGaps)/AUC:
-```{r}
+```{r eval=FALSE, results = 'hide'}
 Clusters1Peptide <- list()
 DistMatrices <- list()
 pdf(paste("Trees_24runsPlasma_upgma_GapsAUC.pdf"))
 # here run also for 1 peptide only (since ScoreMatrix was calculated only for the first peptide above)
 for(peptide in peptidesPlasma[1]) {
-  print(peptide)
   DistMatrices[[peptide]] = as.dist(Score24runsPlasmaMatrices[[peptide]], diag = TRUE)
   Clustered <- hclust(DistMatrices[[peptide]], method = "average")
   my_tree <- as.phylo(Clustered) 
@@ -1169,7 +1168,7 @@ join_table <- function(ScoreMatrix, a, b) {
 ```
 
 Finally, combine all the functions above and get sequence of merged labels.
-```{r, echo = FALSE }
+```{r}
 UPGMA <- function(ScoreMatrix, labels) {
   for (i in 1:(length(ScoreMatrix[1,]) - 1)) {
   # Locate lowest cell in the ScoreMatrix
@@ -1423,7 +1422,7 @@ data2[[run_pair[2]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][idx,
 ```
 
 Update (or download) mergedData:
-``` {r, echo = FALSE}
+``` {r}
 setwd("/Users/utkinaira/Desktop/Study/UofT/HRoest_rotation2/MergedChromPlasma_RDSfiles/")
 mergedStrepChromsPlasma <- readRDS("mergedStrepChroms_All.rds")
 mergedStrepChromsPlasmaSkipNAs <- readRDS("mergedStrepChromsSkipNAs_All.rds")
