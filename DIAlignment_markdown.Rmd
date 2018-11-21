@@ -1,6 +1,12 @@
 ---
-title: "DIAlignment (Utkina I.)"
+title: "Extension of DIAlign package for multi-alignment of targeted proteomics runs by hierarchical clustering"
+author: "Irina Utkina, Shubham Gupta"
+date: "`r Sys.Date()`"
 output: html_document
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE, message=FALSE, warning=FALSE}
@@ -802,7 +808,7 @@ Clustered <- hclust(DistMat, method = "single")
 library(ape)
 class(Clustered) # must be hclust class
 my_tree <- as.phylo(Clustered) 
-plot(my_tree)
+# plot(my_tree)
 ```
 
 ## Analysis of blood plasma dataset (24 runs, 406 peptides): building of a global and local trees (UPGMA algorithm), alignment and merge of runs in an order according to the tree for each peptide
@@ -886,7 +892,7 @@ for (peptide in peptidesPlasma) {
 ```
 
 ## Fit a local alignment between chromatogram groups
-```{r eval=FALSE, results = 'hide'}
+```{r results = 'hide'}
 pair_names <- vector(); runs <- names(StrepChromsPlasma)
 for (i in 1:(length(runsPlasma)-1)){
   for (j in (i+1): length(runsPlasma)){
@@ -1044,15 +1050,16 @@ for(peptide in peptidesPlasma[1]){
 }
 ```
 
-``` {r, echo = FALSE}
- plot(grid.arrange(plotAlignedChroms(StrepChromsPlasma, pair, peptide, StrepAnnotPlasma, #AlignErrorinSec,
-                                         AlignedIndices[[peptide]][[pair]], tA, tB, FourOrTwo = TRUE),
-                grid.arrange(plotsRatioPlasma[[peptide]][[pair]], plotStatsPlasma[[peptide]][[pair]], ncol = 2),
-                       ncol =1))
+``` {r}
+# plot together aligned chromatograms and statplots:
+ # plot(grid.arrange(plotAlignedChroms(StrepChromsPlasma, pair, peptide, StrepAnnotPlasma, #AlignErrorinSec,
+ #                                         AlignedIndices[[peptide]][[pair]], tA, tB, FourOrTwo = TRUE),
+ #                grid.arrange(plotsRatioPlasma[[peptide]][[pair]], plotStatsPlasma[[peptide]][[pair]], ncol = 2),
+ #                       ncol =1))
 ```
 
 Clustering using the score matrices produced as a result of the chosen distance (1+NGaps)/AUC:
-```{r eval=FALSE, results = 'hide'}
+```{r, eval=FALSE, results = 'hide'}
 Clusters1Peptide <- list()
 DistMatrices <- list()
 pdf(paste("Trees_24runsPlasma_upgma_GapsAUC.pdf"))
@@ -1128,7 +1135,9 @@ join_labels <- function(ScoreMatrix, labels, a, b) {
                             dimnames(ScoreMatrix)[[2]][b], sep = "_"))
   return(labels)
 }
+```
 
+```{r}
 # join_table: Join the entries of a table on the cell (a, b) by averaging their data entries
 join_table <- function(ScoreMatrix, a, b) {
   # Swap if the indices are not ordered
@@ -1392,19 +1401,25 @@ data2[[run_pair[2]]][[peptide]][[i]][AlignedIndices[[peptide]][[pair]][[1]][idx,
   
   # Plot aligned chromatograms using appropriate functions depending on type of merging runs:
   if (typeOfRuns == "single") {
-    BeforeMergeSingle <- grid.arrange(plotChromatogram(data1, run_pair[1],peptide,StrepAnnotPlasma,TRUE),
-                                    plotChromatogram(data2,run_pair[2],peptide,StrepAnnotPlasma, TRUE), ncol = 2)
-    plot <- grid.arrange(BeforeMergeSingle, plotChromatogramMerged(mergedData,pair,peptide, TRUE))
+    #BeforeMergeSingle <- grid.arrange(plotChromatogram(data1, run_pair[1],peptide,StrepAnnotPlasma,TRUE),
+    #                               plotChromatogram(data2,run_pair[2],peptide,StrepAnnotPlasma, TRUE), ncol = 2)
+    plot <- grid.arrange(plotChromatogram(data1, run_pair[1],peptide,StrepAnnotPlasma,TRUE),
+                         plotChromatogram(data2,run_pair[2],peptide,StrepAnnotPlasma, TRUE),
+                          plotChromatogramMerged(mergedData,pair,peptide, TRUE), ncol = 1)
   }
   if (typeOfRuns == "singleAndMerged") {
-    BeforeMergeBoth <- grid.arrange(plotChromatogramMerged(data2, run_pair[2], peptide, TRUE) ,
-                                  plotChromatogram(data1,run_pair[1],peptide,StrepAnnotPlasma, TRUE), ncol = 2)
-    plot <- grid.arrange(BeforeMergeBoth, plotChromatogramMerged(mergedData,pair,peptide, TRUE))
+    #BeforeMergeBoth <- grid.arrange(plotChromatogramMerged(data2, run_pair[2], peptide, TRUE) ,
+    #                             plotChromatogram(data1,run_pair[1],peptide,StrepAnnotPlasma, TRUE), ncol = 2)
+    plot <- grid.arrange(plotChromatogramMerged(data2, run_pair[2], peptide, TRUE) ,
+                         plotChromatogram(data1,run_pair[1],peptide,StrepAnnotPlasma, TRUE), 
+                         plotChromatogramMerged(mergedData,pair,peptide, TRUE),ncol =1)
   }
   if (typeOfRuns == "merged") {
-    BeforeMergeMerged <- grid.arrange(plotChromatogramMerged(data1, run_pair[1], peptide, TRUE) ,
-                                    plotChromatogramMerged(data2, run_pair[2], peptide, TRUE), ncol = 2)
-    plot <- grid.arrange(BeforeMergeMerged, plotChromatogramMerged(mergedData,pair,peptide, TRUE))
+    #BeforeMergeMerged <- grid.arrange(plotChromatogramMerged(data1, run_pair[1], peptide, TRUE) ,
+    #                                plotChromatogramMerged(data2, run_pair[2], peptide, TRUE), ncol = 2)
+    plot <- grid.arrange(plotChromatogramMerged(data1, run_pair[1], peptide, TRUE) ,
+                         plotChromatogramMerged(data2, run_pair[2], peptide, TRUE), 
+                         plotChromatogramMerged(mergedData,pair,peptide, TRUE), ncol=1)
   }
   
   # Depending on the relabeling model chosen save resulting dataframes with "raw" data for merged runs with corresponding names:
@@ -1431,7 +1446,7 @@ mergedStrepChromsPlasmaRandomNAs <- readRDS("mergedStrepChromsRandomNAs_All.rds"
 
 ## Perform Alignment and merging in order according to ```MergingSequenceLabels```
 This part of code is in progress
-``` {r, results = 'hide'}
+``` {r eval = FALSE, results = 'hide'}
 for (i in 1:length(MergingSequenceLabels)) {
   if (length(strsplit(MergingSequenceLabels[i], "_")[[1]]) == 2) {
     # run in 3 different modes: model considering all NAs (allNAs = TRUE), model considering only terminal NAs (allNAs = FALSE, randomNAs = FALSE), and model considering random NAs (randomNAs = TRUE)
